@@ -38,7 +38,7 @@ resource "aws_sqs_queue" "product_events_fifo" {
   content_based_deduplication = true
 
   tags = {
-    Environment = "lab"
+    Environment = "labtest"
     Project     = "microservices-project"
   }
 }
