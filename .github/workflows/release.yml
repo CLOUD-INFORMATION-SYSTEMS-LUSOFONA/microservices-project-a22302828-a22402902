@@ -1,0 +1,14 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  product:
+    uses: ./.github/workflows/reusable-image.yml
+    with:
+      service: product-service
+    secrets: inherit
