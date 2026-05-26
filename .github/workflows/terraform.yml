@@ -3,12 +3,12 @@ name: Terraform
 on:
   pull_request:
     paths:
-      - 'infra/**'
+      - 'infra/week9-sqs/**'
 
   push:
     branches: [ main ]
     paths:
-      - 'infra/**'
+      - 'infra/week9-sqs/**'
 
 permissions:
   id-token: write
