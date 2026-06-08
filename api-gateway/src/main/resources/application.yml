@@ -1,27 +1,24 @@
 spring:
   application:
     name: api-gateway
+
   cloud:
     gateway:
       routes:
         - id: user-service
           uri: http://localhost:8081
           predicates:
-            - Path=/api/users/**
-          filters:
-            - StripPrefix=1
+            - Path=/users,/users/**
+
         - id: product-service
           uri: http://localhost:8082
           predicates:
-            - Path=/api/products/**
-          filters:
-            - StripPrefix=1
+            - Path=/products,/products/**
+
         - id: order-service
           uri: http://localhost:8083
           predicates:
-            - Path=/api/orders/**
-          filters:
-            - StripPrefix=1
+            - Path=/orders,/orders/**
 
 server:
   port: 8080
@@ -30,13 +27,13 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,gateway,prometheus,metrics
+        include: health,info,prometheus,metrics
   endpoint:
     health:
       show-details: always
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
 
 springdoc:
@@ -57,4 +54,3 @@ logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     pt.ulusofona.apigateway: DEBUG
-

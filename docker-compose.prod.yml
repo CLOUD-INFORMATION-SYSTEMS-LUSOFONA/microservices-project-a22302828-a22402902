@@ -1,0 +1,67 @@
+services:
+  user-service:
+    image: duartecachata/microservices-user-service:latest
+    container_name: user-service
+    network_mode: host
+    restart: "no"
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://database-1.czgk0e2woppa.eu-central-1.rds.amazonaws.com:5432/postgres"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+      SPRING_DATASOURCE_USERNAME: "${DB_USERNAME}"
+      SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+
+  product-service:
+    image: duartecachata/microservices-product-service:latest
+    container_name: product-service
+    network_mode: host
+    restart: "no"
+    environment:
+      SERVER_PORT: 8082
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://database-1.czgk0e2woppa.eu-central-1.rds.amazonaws.com:5432/postgres"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+      SPRING_DATASOURCE_USERNAME: "${DB_USERNAME}"
+      SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+      SPRING_KAFKA_LISTENER_AUTO_STARTUP: "false"
+      CLOUD_SQS_PRODUCT_EVENTS_ENABLED: "true"
+      CLOUD_SQS_PRODUCT_EVENTS_QUEUE_URL: "https://sqs.eu-central-1.amazonaws.com/945239280490/cn-course-product-events"
+      CLOUD_SQS_PRODUCT_EVENTS_REGION: "eu-central-1"
+
+  order-service:
+    image: duartecachata/microservices-order-service:latest
+    container_name: order-service
+    network_mode: host
+    restart: "no"
+    environment:
+      SERVER_PORT: 8083
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://microservices-dev-postgres.czgygqsgggpk.eu-central-1.rds.amazonaws.com:5432/microservices"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+      SPRING_DATASOURCE_USERNAME: "${DB_USERNAME}"
+      SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+      SERVICES_USER_URL: "http://localhost:8081"
+      SERVICES_PRODUCT_URL: "http://localhost:8082"
+      SPRING_KAFKA_LISTENER_AUTO_STARTUP: "false"
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_ENABLED: "true"
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_QUEUE_URL: "https://sqs.eu-central-1.amazonaws.com/945239280490/cn-course-product-events"
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_REGION: "eu-central-1"
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_POLL_INTERVAL_MS: "5000"
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_MAX_NUMBER_OF_MESSAGES: "10"
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_WAIT_TIME_SECONDS: "20"
+
+  api-gateway:
+    image: duartecachata/microservices-api-gateway:latest
+    container_name: api-gateway
+    network_mode: host
+    restart: "no"
+    environment:
+      SERVER_PORT: 8080
+      USER_SERVICE_URL: "http://localhost:8081"
+      PRODUCT_SERVICE_URL: "http://localhost:8082"
+      ORDER_SERVICE_URL: "http://localhost:8083"
+    depends_on:
+      - user-service
+      - product-service
+      - order-service

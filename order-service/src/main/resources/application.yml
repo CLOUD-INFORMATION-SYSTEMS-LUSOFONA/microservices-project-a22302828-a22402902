@@ -4,18 +4,18 @@ server:
 spring:
   application:
     name: order-service
-  
+
   datasource:
     url: jdbc:h2:mem:orderdb
     driver-class-name: org.h2.Driver
     username: sa
-    password: 
-  
+    password:
+
   h2:
     console:
       enabled: true
       path: /h2-console
-  
+
   jpa:
     open-in-view: false
     hibernate:
@@ -24,9 +24,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  
+
   kafka:
     bootstrap-servers: localhost:9092
+    listener:
+      auto-startup: false
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -39,7 +41,6 @@ spring:
         spring.json.trusted.packages: "*"
         spring.json.type.mapping: orderCreated:pt.ulusofona.orderservice.event.OrderCreatedEvent,orderStatusChanged:pt.ulusofona.orderservice.event.OrderStatusChangedEvent
 
-# Feign Client Configuration
 feign:
   client:
     config:
@@ -48,7 +49,6 @@ feign:
         readTimeout: 5000
         loggerLevel: basic
 
-# Actuator Configuration
 management:
   endpoints:
     web:
@@ -78,10 +78,18 @@ springdoc:
       name: Cloud Computing Course
       email: support@example.com
 
-# Service URLs (for Feign clients)
 services:
   user:
     url: http://localhost:8081
   product:
     url: http://localhost:8082
 
+cloud:
+  sqs:
+    product-events-consumer:
+      enabled: ${CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_ENABLED:false}
+      queue-url: ${CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_QUEUE_URL:}
+      region: ${CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_REGION:}
+      poll-interval-ms: ${CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_POLL_INTERVAL_MS:5000}
+      max-number-of-messages: ${CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_MAX_NUMBER_OF_MESSAGES:10}
+      wait-time-seconds: ${CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_WAIT_TIME_SECONDS:20}
